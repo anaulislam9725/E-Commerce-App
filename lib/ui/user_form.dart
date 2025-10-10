@@ -60,6 +60,7 @@ class _UserFormState extends State<UserForm> {
           "age": ageController.text,
         })
         .then(
+          // ignore: use_build_context_synchronously
           (value) => Navigator.pushNamed(context, BottomNavController.path),
         );
 

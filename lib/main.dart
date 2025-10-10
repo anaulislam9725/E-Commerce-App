@@ -1,7 +1,9 @@
 import 'package:e_commerce_app/ui/bottom_nav_controller.dart';
 import 'package:e_commerce_app/ui/bottom_nav_pages/home.dart';
 import 'package:e_commerce_app/ui/login_screen.dart';
+import 'package:e_commerce_app/ui/product_details_screen.dart';
 import 'package:e_commerce_app/ui/registration_screen.dart';
+import 'package:e_commerce_app/ui/search_screen.dart';
 import 'package:e_commerce_app/ui/splash_screen.dart';
 import 'package:e_commerce_app/ui/user_form.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
       builder: (_, child) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        initialRoute: HomeScreen.path,
+        initialRoute: BottomNavController.path,
         routes: {
           SplashScreen1.path: (context) => SplashScreen1(),
           LoginScreen.path: (context) => LoginScreen(),
@@ -35,6 +37,8 @@ class MyApp extends StatelessWidget {
           SignUpScreen.path: (context) => SignUpScreen(),
           UserForm.path: (context) => UserForm(),
           HomeScreen.path: (context) => HomeScreen(),
+          SearchScreen.path: (context) => SearchScreen(),
+          DetailsScreen.path: (context) => DetailsScreen(),
         },
       ),
     );

@@ -8,11 +8,8 @@ class AppDimansion {
   // APP DEFAULT BORDER RADIUS
   static BorderRadius kBorderRadius = BorderRadius.circular(32.r);
 
-  /// APP DEFAULT VARTICALY PADDING
-  static EdgeInsets varticalPadding = EdgeInsets.symmetric(horizontal: 24.h);
-
   /// APP DEFAULT HORIZONTAL PADDING
-  static EdgeInsets kDefaultPadding = EdgeInsets.symmetric(horizontal: 24.w);
+  static EdgeInsets kDefaultPadding = EdgeInsets.symmetric(horizontal: 20.w);
 
   /// APP BUTTON DEFAULT HEIGHT
   static double buttonHeight = 50.h;

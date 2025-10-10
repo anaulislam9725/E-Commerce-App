@@ -18,8 +18,12 @@ class CustomTextField extends StatelessWidget {
   final Color? fillColor, hintColor;
   final BorderRadius? borderRadius;
   final EdgeInsetsGeometry? contentPadding;
+  final void Function()? onTap;
+  final TextStyle? style;
   const CustomTextField({
     super.key,
+    this.style,
+    this.onTap,
     this.contentPadding,
     this.borderRadius,
     this.hintColor,
@@ -40,6 +44,7 @@ class CustomTextField extends StatelessWidget {
     return SizedBox(
       height: AppDimansion.textFieldHeight,
       child: TextFormField(
+        onTap: onTap,
         inputFormatters: inputFormatters,
         readOnly: readOnly ?? false,
         controller: controller,
@@ -49,8 +54,11 @@ class CustomTextField extends StatelessWidget {
         cursorColor: AppColors.mainColor,
         cursorHeight: 18.h,
 
-        style: TextStyle(color: Colors.white),
+        style: style ?? TextStyle(color: Colors.white),
         decoration: InputDecoration(
+          contentPadding:
+              contentPadding ??
+              EdgeInsets.symmetric(vertical: 15.w, horizontal: 30.w),
           hintText: hintText,
           hintStyle: Styles.bodySmall.copyWith(
             color: hintColor ?? AppColors.whiteColor.withValues(alpha: 0.5),
@@ -61,12 +69,12 @@ class CustomTextField extends StatelessWidget {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: borderRadius ?? BorderRadius.circular(4.r),
-            borderSide: BorderSide(color: AppColors.greyColor),
+            borderSide: BorderSide.none,
           ),
           fillColor: fillColor ?? AppColors.greyColor.withValues(alpha: 0.8),
           filled: true,
-          prefixIcon: prefixIcon,
 
+          prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
         ),
       ),
