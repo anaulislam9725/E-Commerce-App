@@ -12,7 +12,7 @@ class AppDimansion {
   static EdgeInsets kDefaultPadding = EdgeInsets.symmetric(horizontal: 20.w);
 
   /// APP BUTTON DEFAULT HEIGHT
-  static double buttonHeight = 50.h;
+  static double buttonHeight = 44.h;
 
   /// APP DEFAULT TEXTFIELD HEIGHT
   static double textFieldHeight = 50.h;

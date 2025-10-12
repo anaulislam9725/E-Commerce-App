@@ -10,7 +10,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool? obscureText;
   final void Function(String)? onChanged;
-  final String hintText;
+  final String? hintText;
   final Widget? suffixIcon;
   final Widget? prefixIcon;
   final TextInputType? keyboardType;
@@ -20,6 +20,10 @@ class CustomTextField extends StatelessWidget {
   final EdgeInsetsGeometry? contentPadding;
   final void Function()? onTap;
   final TextStyle? style;
+  final InputBorder? focusedBorder;
+  final InputBorder? enabledBorder;
+  final InputDecoration? decoration;
+
   const CustomTextField({
     super.key,
     this.style,
@@ -33,10 +37,13 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.onChanged,
     this.obscureText,
-    required this.hintText,
+    this.hintText,
     this.prefixIcon,
     this.suffixIcon,
     this.keyboardType,
+    this.focusedBorder,
+    this.enabledBorder,
+    this.decoration,
   });
 
   @override
@@ -55,28 +62,35 @@ class CustomTextField extends StatelessWidget {
         cursorHeight: 18.h,
 
         style: style ?? TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          contentPadding:
-              contentPadding ??
-              EdgeInsets.symmetric(vertical: 15.w, horizontal: 30.w),
-          hintText: hintText,
-          hintStyle: Styles.bodySmall.copyWith(
-            color: hintColor ?? AppColors.whiteColor.withValues(alpha: 0.5),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: borderRadius ?? BorderRadius.circular(4.r),
-            borderSide: BorderSide(color: AppColors.mainColor),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: borderRadius ?? BorderRadius.circular(4.r),
-            borderSide: BorderSide.none,
-          ),
-          fillColor: fillColor ?? AppColors.greyColor.withValues(alpha: 0.8),
-          filled: true,
+        decoration:
+            decoration ??
+            InputDecoration(
+              contentPadding:
+                  contentPadding ??
+                  EdgeInsets.symmetric(vertical: 15.w, horizontal: 30.w),
+              hintText: hintText ?? hintText,
+              hintStyle: Styles.bodySmall.copyWith(
+                color: hintColor ?? AppColors.whiteColor.withValues(alpha: 0.5),
+              ),
+              focusedBorder:
+                  focusedBorder ??
+                  OutlineInputBorder(
+                    borderRadius: borderRadius ?? BorderRadius.circular(4.r),
+                    borderSide: BorderSide(color: AppColors.mainColor),
+                  ),
+              enabledBorder:
+                  enabledBorder ??
+                  OutlineInputBorder(
+                    borderRadius: borderRadius ?? BorderRadius.circular(4.r),
+                    borderSide: BorderSide.none,
+                  ),
+              fillColor:
+                  fillColor ?? AppColors.greyColor.withValues(alpha: 0.8),
+              filled: true,
 
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
-        ),
+              prefixIcon: prefixIcon,
+              suffixIcon: suffixIcon,
+            ),
       ),
     );
   }

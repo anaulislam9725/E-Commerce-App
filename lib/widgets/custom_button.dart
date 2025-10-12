@@ -5,9 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomButton extends StatelessWidget {
-  final String? text;
+  final String text;
   final void Function()? onTap;
-  const CustomButton({super.key, this.text, this.onTap});
+  final double? width;
+  final double? height;
+  final BorderRadiusGeometry? borderRadius;
+  const CustomButton({
+    super.key,
+    required this.text,
+    this.onTap,
+    this.width,
+    this.height,
+    this.borderRadius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +27,22 @@ class CustomButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(32.r),
         onTap: onTap,
         child: Ink(
-          height: AppDimansion.buttonHeight,
-          width: double.infinity,
+          height: height ?? AppDimansion.buttonHeight,
+          width: width ?? double.infinity,
           decoration: BoxDecoration(
-            borderRadius: AppDimansion.kBorderRadius,
+            borderRadius: borderRadius ?? AppDimansion.kBorderRadius,
             color: AppColors.mainColor,
           ),
-          child: Center(child: Text(text ?? "", style: Styles.bodyLarge)),
+          child: Center(
+            child: Text(
+              text,
+              style: Styles.bodyLarge.copyWith(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
+                color: AppColors.widgetColor,
+              ),
+            ),
+          ),
         ),
       ),
     );
