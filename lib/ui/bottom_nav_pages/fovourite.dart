@@ -11,7 +11,16 @@ class _FovouriteScreenState extends State<FovouriteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.teal,
+      body: Column(
+        children: [
+          Container(
+            height: 120,
+            width: 120,
+            decoration: BoxDecoration(),
+            child: Image.asset("assets/email.png", color: Colors.black),
+          ),
+        ],
+      ),
     );
   }
 }
