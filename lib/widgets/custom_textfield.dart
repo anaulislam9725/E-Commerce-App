@@ -23,9 +23,10 @@ class CustomTextField extends StatelessWidget {
   final InputBorder? focusedBorder;
   final InputBorder? enabledBorder;
   final InputDecoration? decoration;
-
+  final TextAlign? textAlign;
   const CustomTextField({
     super.key,
+
     this.style,
     this.onTap,
     this.contentPadding,
@@ -44,6 +45,7 @@ class CustomTextField extends StatelessWidget {
     this.focusedBorder,
     this.enabledBorder,
     this.decoration,
+    this.textAlign,
   });
 
   @override
@@ -51,6 +53,7 @@ class CustomTextField extends StatelessWidget {
     return SizedBox(
       height: AppDimansion.textFieldHeight,
       child: TextFormField(
+        textAlign: textAlign ?? TextAlign.start,
         onTap: onTap,
         inputFormatters: inputFormatters,
         readOnly: readOnly ?? false,
