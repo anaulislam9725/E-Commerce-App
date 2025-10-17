@@ -1,11 +1,17 @@
+import 'package:e_commerce_app/mainController.dart';
 import 'package:e_commerce_app/ui/bottom_nav_controller.dart';
+import 'package:e_commerce_app/ui/bottom_nav_pages/cart.dart';
+import 'package:e_commerce_app/ui/bottom_nav_pages/fovourite.dart';
 import 'package:e_commerce_app/ui/bottom_nav_pages/home.dart';
 import 'package:e_commerce_app/ui/bottom_nav_pages/profile.dart';
+import 'package:e_commerce_app/ui/forgot_password.dart';
 import 'package:e_commerce_app/ui/login_screen.dart';
+import 'package:e_commerce_app/ui/priduct.dart';
 import 'package:e_commerce_app/ui/product_details_screen.dart';
 import 'package:e_commerce_app/ui/registration_screen.dart';
 import 'package:e_commerce_app/ui/search_screen.dart';
 import 'package:e_commerce_app/ui/splash_screen.dart';
+
 import 'package:e_commerce_app/ui/user_form.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -30,17 +36,22 @@ class MyApp extends StatelessWidget {
       builder: (_, child) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        initialRoute: BottomNavController.path,
+        initialRoute: SplashScreen1.path,
         routes: {
-          SplashScreen1.path: (context) => SplashScreen1(),
+          Product.path:(_)=>Product(),
+          SplashScreen1.path:(_)=>SplashScreen1(),
           LoginScreen.path: (context) => LoginScreen(),
           BottomNavController.path: (context) => BottomNavController(),
           SignUpScreen.path: (context) => SignUpScreen(),
           UserForm.path: (context) => UserForm(),
           HomeScreen.path: (context) => HomeScreen(),
+          FavouriteScreen.path: (context) => FavouriteScreen(),
+          CartScreen.path: (context) => CartScreen(),
           ProfileScreen.path: (context) => ProfileScreen(),
           SearchScreen.path: (context) => SearchScreen(),
           DetailsScreen.path: (context) => DetailsScreen(),
+          MainController.path: (context) => MainController(),
+          ForgotPasswordScreen.path: (context) => ForgotPasswordScreen(),
         },
       ),
     );

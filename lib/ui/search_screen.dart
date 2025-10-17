@@ -24,13 +24,28 @@ class _SearchScreenState extends State<SearchScreen> {
           padding: AppDimansion.kDefaultPadding,
           child: Column(
             children: [
-              SizedBox(height: 12.h),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Image.asset(
+                      "assets/left-arrow.png",
+                      height: 28.h,
+                      width: 28.w,
+                      color: AppColors.greyColor,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 22.h),
               CustomTextField(
+                autofocus: true,
                 controller: searchController,
                 onChanged: (val) {
                   setState(() {
                     inputText = val;
-                   
                   });
                 },
                 borderRadius: AppDimansion.kBorderRadius,
@@ -53,7 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection("product")
-                      .where("name", isEqualTo:inputText)
+                      .where("name", isEqualTo: inputText)
                       .snapshots(),
                   builder:
                       (
@@ -73,19 +88,24 @@ class _SearchScreenState extends State<SearchScreen> {
                           ) {
                             Map<String, dynamic> data =
                                 document.data() as Map<String, dynamic>;
-                            return Card(
-                              elevation: 8,
-                              child: ListTile(
-                                contentPadding: EdgeInsets.only(left: 8),
-                                title: Text(data["name"]),
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.horizontal(
-                                    left: Radius.circular(8),
-                                  ),
-                                  child: Image.network(
-                                    data["image"][1],
-                                    fit: BoxFit.cover,
-                                    width: 90.w,
+                            return GestureDetector(
+                              onTap: (){
+
+                              },
+                              child: Card(
+                                elevation: 8,
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.only(left: 8),
+                                  title: Text(data["name"]),
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.horizontal(
+                                      left: Radius.circular(8),
+                                    ),
+                                    child: Image.network(
+                                      data["image"][1],
+                                      fit: BoxFit.cover,
+                                      width: 90.w,
+                                    ),
                                   ),
                                 ),
                               ),

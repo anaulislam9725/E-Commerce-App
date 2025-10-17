@@ -1,7 +1,6 @@
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
-import 'package:e_commerce_app/ui/bottom_nav_controller.dart';
 import 'package:e_commerce_app/ui/user_form.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
@@ -224,12 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           SocialContainer(
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                BottomNavController.path,
-                              );
-                            },
+                            onTap: () {},
                             image: Image.asset("assets/fb.png"),
                           ),
                           SocialContainer(

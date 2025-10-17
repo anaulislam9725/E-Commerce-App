@@ -1,5 +1,5 @@
 import 'package:e_commerce_app/const/app_colors.dart';
-import 'package:e_commerce_app/ui/login_screen.dart';
+import 'package:e_commerce_app/mainController.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,7 +17,7 @@ class _SplashScreen1State extends State<SplashScreen1> {
   void initState() {
     Future.delayed(Duration(seconds: 3), () {
       // ignore: use_build_context_synchronously
-      Navigator.pushNamed(context, LoginScreen.path);
+      Navigator.pushNamed(context, MainController.path);
     });
     super.initState();
   }

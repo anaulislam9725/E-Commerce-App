@@ -1,7 +1,7 @@
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
-import 'package:e_commerce_app/ui/bottom_nav_controller.dart';
+
 import 'package:e_commerce_app/ui/registration_screen.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
@@ -23,28 +23,111 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  Future passwordResed() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: emailController.text.trim(),
+      );
+      showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text("Password reset link send! check your email"),
+          );
+        },
+      );
+      emailController.clear();
+    } on FirebaseAuthException catch (e) {
+      showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        builder: (context) {
+          return AlertDialog(content: Text(e.message.toString()));
+        },
+      );
+    }
+  }
+
   signIn() async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
       );
-      var authCredential = credential.user;
-
-      if (authCredential!.uid.isNotEmpty) {
-        Fluttertoast.showToast(msg: "User logged in successfully");
-        // ignore: use_build_context_synchronously
-        Navigator.pushNamed(context, BottomNavController.path);
-        emailController.clear();
-        passwordController.clear();
-      } else {
-        Fluttertoast.showToast(msg: "Something is worng");
-      }
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.code.toString());
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
     }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  showDialogueBox(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.whiteColor,
+
+          title: Column(
+            children: [
+              Text(
+                "Forgot Password",
+                style: Styles.baseStyle.copyWith(
+                  color: AppColors.blackColor,
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 30.h),
+              Text(
+                "Please enter your email address to receive a verification code on your email",
+                style: Styles.baseStyle.copyWith(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 40.h),
+              CustomTextField(
+                contentPadding: EdgeInsets.only(
+                  left: 18.r,
+                  top: 14.r,
+                  bottom: 14.r,
+                ),
+
+                controller: emailController,
+                style: TextStyle(color: AppColors.greyColor),
+                hintText: "Enter your Email",
+                hintColor: AppColors.greyColor.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(12.r),
+                fillColor: AppColors.mainColor.withValues(alpha: 0.1),
+              ),
+              SizedBox(height: 30.h),
+              CustomButton(
+                onTap: () {
+                  passwordResed();
+                },
+
+                borderRadius: BorderRadius.circular(12.r),
+                text: "Continue",
+              ),
+            ],
+          ),
+
+          // print
+          // Text(controller.text.toString()),
+        );
+      },
+    );
   }
 
   @override
@@ -133,7 +216,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              showDialogueBox(context);
+                            },
                             child: Text(
                               "Forgot Password?",
                               style: Styles.bodySmall.copyWith(

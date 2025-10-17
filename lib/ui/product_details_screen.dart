@@ -1,11 +1,16 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
+import 'package:e_commerce_app/ui/bottom_nav_pages/cart.dart';
+import 'package:e_commerce_app/ui/search_screen.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 // ignore: must_be_immutable
 class DetailsScreen extends StatefulWidget {
@@ -20,6 +25,61 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   var dotPosition = 0;
   int currentValue = 1;
+  Future addToCart() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    var currentUser = auth.currentUser;
+    CollectionReference collectionReference = FirebaseFirestore.instance
+        .collection("users-cart-items");
+    return collectionReference
+        .doc(currentUser?.email)
+        .collection("items")
+        .doc()
+        .set({
+          "name": widget.allProduct["product-name"],
+          "price": widget.allProduct["product-price"],
+          "image": widget.allProduct["product-image"],
+        })
+        .then(
+          (onValue) => {
+            Fluttertoast.showToast(
+              msg: "Successfully added",
+              toastLength: Toast.LENGTH_SHORT,
+
+              backgroundColor: AppColors.greyColor,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            ),
+          },
+        );
+  }
+
+  Future addToFavourite() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    var currentUser = auth.currentUser;
+    CollectionReference collectionReference = FirebaseFirestore.instance
+        .collection("users-fovourite-items");
+    return collectionReference
+        .doc(currentUser?.email)
+        .collection("items")
+        .doc()
+        .set({
+          "name": widget.allProduct["product-name"],
+          "price": widget.allProduct["product-price"],
+          "image": widget.allProduct["product-image"],
+        })
+        .then(
+          (onValue) => {
+            Fluttertoast.showToast(
+              msg: "Successfully added",
+              toastLength: Toast.LENGTH_SHORT,
+
+              backgroundColor: AppColors.greyColor,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            ),
+          },
+        );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,22 +105,34 @@ class _DetailsScreenState extends State<DetailsScreen> {
           padding: EdgeInsets.only(left: 2.w),
           child: Text(
             "Product Details",
-            style: Styles.bodyLarge.copyWith(color: AppColors.greyColor),
+            style: Styles.bodyLarge.copyWith(
+              color: AppColors.blackColor.withValues(alpha: 0.7),
+            ),
           ),
         ),
         actions: [
-          Icon(
-            Icons.search,
-            size: 26.h,
-            color: AppColors.blackColor.withValues(alpha: 0.4),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, SearchScreen.path);
+            },
+            child: Icon(
+              Icons.search,
+              size: 26.h,
+              color: AppColors.blackColor.withValues(alpha: 0.4),
+            ),
           ),
 
           Padding(
             padding: EdgeInsets.only(right: 24.w, left: 12.w),
-            child: Icon(
-              Icons.shopping_cart_outlined,
-              size: 26.h,
-              color: AppColors.blackColor.withValues(alpha: 0.4),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, CartScreen.path);
+              },
+              child: Icon(
+                Icons.shopping_cart_outlined,
+                size: 26.h,
+                color: AppColors.blackColor.withValues(alpha: 0.4),
+              ),
             ),
           ),
         ],
@@ -285,23 +357,56 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ),
                   ),
                   Spacer(),
-                  Container(
-                    height: 38.h,
-                    width: 38.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.redColor.withValues(alpha: 0.7),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.favorite,
-                          size: 20.h,
-                          color: AppColors.widgetColor,
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("users-fovourite-items")
+                        .doc(FirebaseAuth.instance.currentUser!.email)
+                        .collection("items")
+                        .where(
+                          "name",
+                          isEqualTo: widget.allProduct["product-name"],
+                        )
+                        .snapshots(),
+                    builder: (BuildContext context, AsyncSnapshot snapshots) {
+                      if (snapshots.data == null) {
+                        return Text("");
+                      }
+                      return Container(
+                        height: 38.h,
+                        width: 38.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.redColor.withValues(alpha: 0.7),
+                          shape: BoxShape.circle,
                         ),
-                      ),
-                    ),
+                        child: Center(
+                          child: IconButton(
+                            onPressed: () {
+                              snapshots.data.docs.length == 0
+                                  ? addToFavourite()
+                                  : Fluttertoast.showToast(
+                                      msg: "Already added",
+                                      toastLength: Toast.LENGTH_SHORT,
+
+                                      backgroundColor: AppColors.greyColor,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0,
+                                    );
+                            },
+                            icon: snapshots.data.docs.length == 0
+                                ? Icon(
+                                    Icons.favorite_outline,
+                                    size: 20.h,
+                                    color: AppColors.widgetColor,
+                                  )
+                                : Icon(
+                                    Icons.favorite,
+                                    size: 20.h,
+                                    color: AppColors.widgetColor,
+                                  ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -317,7 +422,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ),
                     child: Center(
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          addToCart();
+                        },
                         icon: Icon(
                           Icons.shopping_cart_outlined,
                           size: 28.h,

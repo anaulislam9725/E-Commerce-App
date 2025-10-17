@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
+import 'package:e_commerce_app/ui/bottom_nav_controller.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,8 +39,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         })
         // ignore: use_build_context_synchronously
         .then((onValue) {
+          Fluttertoast.showToast(
+            msg: "Successfully Updated",
+            toastLength: Toast.LENGTH_SHORT,
+
+            timeInSecForIosWeb: 1,
+            backgroundColor: AppColors.greyColor,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          // ignore: use_build_context_synchronously
           Navigator.pop(context);
-          Fluttertoast();
         });
   }
 
@@ -54,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // title: Text("print-----${}"),
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, BottomNavController.path);
           },
           icon: Image.asset(
             "assets/left-arrow.png",
@@ -119,7 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // ------------------- show user info in the textfield--------------
 
                     nameController.text = data["name".toString()];
-                    numberController.text = data["phone".toString()];
+                    numberController.text = data["number".toString()];
 
                     emailController.text = FirebaseAuth
                         .instance
@@ -144,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           controller: nameController,
                           decoration: InputDecoration(
-                            prefixIcon: Container(
+                            prefixIcon: SizedBox(
                               width: 130.w,
                               child: Padding(
                                 padding: EdgeInsets.only(bottom: 8.h),
@@ -215,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           decoration: InputDecoration(
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 8.h),
-                              child: Container(
+                              child: SizedBox(
                                 width: 100.w,
                                 child: Row(
                                   children: [
@@ -230,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     SizedBox(width: 14.w),
                                     Text(
-                                      "Phone",
+                                      "Number",
                                       style: Styles.smallTitle.copyWith(
                                         fontSize: 18.sp,
                                         color: AppColors.blackColor.withValues(
@@ -291,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             // prefixIcon: Icon(Icons.email, size: 28),
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 8.h),
-                              child: Container(
+                              child: SizedBox(
                                 width: 100.w,
                                 child: Row(
                                   children: [
@@ -306,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     SizedBox(width: 14.w),
                                     Text(
-                                      "Phone",
+                                      "Email",
                                       style: Styles.smallTitle.copyWith(
                                         fontSize: 18.sp,
                                         color: AppColors.blackColor.withValues(
@@ -339,8 +349,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
 
-                SizedBox(height: 120.h),
-                CustomButton(onTap: () {}, text: "LOGOUT"),
+                SizedBox(height: 90.h),
+                CustomButton(
+                  onTap: () {
+                    FirebaseAuth.instance.signOut();
+                  },
+                  text: "LOGOUT",
+                ),
               ],
             ),
           ),
@@ -370,13 +385,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text("Cancel"),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(color: AppColors.redColor),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
                     updateData(userInfo, controller.text);
                   },
-                  child: Text("Done", style: TextStyle(color: Colors.green)),
+                  child: Text(
+                    "Confirm",
+                    style: TextStyle(color: Colors.blueAccent),
+                  ),
                 ),
               ],
             ),
