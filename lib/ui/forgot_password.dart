@@ -1,12 +1,13 @@
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
+import 'package:e_commerce_app/controllers/forgot_pass_controller.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   static final String path = "ForgotPasswordScreen";
@@ -17,45 +18,15 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController emailController = TextEditingController();
-  @override
-  void dispose() {
-    emailController.dispose;
-    super.dispose();
-  }
-
-  Future passwordResed() async {
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(
-        email: emailController.text.trim(),
-      );
-      showDialog(
-        // ignore: use_build_context_synchronously
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text("Password reset link send! check your email"),
-          );
-        },
-      );
-      emailController.clear();
-    } on FirebaseAuthException catch (e) {
-      showDialog(
-        // ignore: use_build_context_synchronously
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(e.message.toString()));
-        },
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ForgotPassController forgotPassController = Get.put(
+      ForgotPassController(),
+    );
     return Scaffold(
       backgroundColor: AppColors.widgetColor,
       body: Padding(
-        padding: AppDimansion.kDefaultPadding,
+        padding: AppDimansions.kDefaultPadding,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -75,7 +46,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   top: 14.r,
                   bottom: 14.r,
                 ),
-                controller: emailController,
+                controller: forgotPassController.emailController,
                 style: TextStyle(color: AppColors.greyColor),
                 hintText: "Email",
                 hintColor: AppColors.greyColor.withValues(alpha: 0.7),
@@ -85,7 +56,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               SizedBox(height: 60.h),
               CustomButton(
                 onTap: () {
-                  passwordResed();
+                  forgotPassController.passwordResed(context);
                 },
                 width: 160.w,
                 borderRadius: BorderRadius.circular(12.r),

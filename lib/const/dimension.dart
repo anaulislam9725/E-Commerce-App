@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
-class AppDimansion {
-  //   static double screenHeight = Get.height;
-  // static double screenWidth = Get.width;
+class AppDimansions {
+  static double screenHeight = Get.height;
+  static double screenWidth = Get.width;
 
   // APP DEFAULT BORDER RADIUS
   static BorderRadius kBorderRadius = BorderRadius.circular(32.r);

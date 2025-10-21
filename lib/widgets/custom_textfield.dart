@@ -52,7 +52,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: AppDimansion.textFieldHeight,
+      height: AppDimansions.textFieldHeight,
       child: TextFormField(
         autofocus: autofocus ?? false,
         textAlign: textAlign ?? TextAlign.start,

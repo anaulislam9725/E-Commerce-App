@@ -1,42 +1,48 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
-import 'package:e_commerce_app/ui/bottom_nav_controller.dart';
+import 'package:e_commerce_app/controllers/cart_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 
 class CartScreen extends StatefulWidget {
   static final path = "/CartScreen";
-  const CartScreen({super.key});
+  final bool? isHide;
+  const CartScreen({super.key, this.isHide = false});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
+
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
+    final CartController cartController = Get.put(CartController());
     return Scaffold(
       backgroundColor: AppColors.widgetColor,
       appBar: AppBar(
-        backgroundColor: AppColors.whiteColor,
-        elevation: 5,
-        leadingWidth: 60.w,
+        backgroundColor: AppColors.widgetColor,
         automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: EdgeInsets.only(left: 26.w, right: 10.w),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, BottomNavController.path);
-            },
-            child: Image.asset(
-              "assets/left-arrow.png",
-              color: AppColors.blackColor.withValues(alpha: 0.7),
-            ),
-          ),
-        ),
+        leadingWidth: 90.w,
+
+        leading: widget.isHide == true
+            ? IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+
+                icon: Image.asset(
+                  "assets/left-arrow.png",
+                  fit: BoxFit.cover,
+                  width: 34,
+                  color: AppColors.blackColor.withValues(alpha: 0.4),
+                ),
+              )
+            : Text(""),
         title: Text(
           "My Cart",
           style: Styles.bodyMedium.copyWith(
@@ -44,6 +50,7 @@ class _CartScreenState extends State<CartScreen> {
             color: AppColors.blackColor.withValues(alpha: 0.7),
           ),
         ),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: StreamBuilder(
@@ -67,7 +74,7 @@ class _CartScreenState extends State<CartScreen> {
                 DocumentSnapshot documentSnapshot = snapshots.data!.docs[index];
 
                 return Padding(
-                  padding: AppDimansion.kDefaultPadding,
+                  padding: AppDimansions.kDefaultPadding,
                   child: Container(
                     padding: EdgeInsets.zero,
                     margin: EdgeInsets.only(top: 18.h),
@@ -91,14 +98,20 @@ class _CartScreenState extends State<CartScreen> {
                           borderRadius: BorderRadius.horizontal(
                             left: Radius.circular(8.r),
                           ),
-                          child: Image.network(
-                            documentSnapshot["image"][1],
+                          child: CachedNetworkImage(
+                            imageUrl: documentSnapshot["image"][1],
                             fit: BoxFit.cover,
                             height: double.infinity,
                             width: 100.w,
                           ),
                         ),
-                        title: Text(documentSnapshot["name"].toString()),
+                        title: Text(
+                          documentSnapshot["name"].toString(),
+                          style: Styles.bodyMedium.copyWith(
+                            overflow: TextOverflow.ellipsis,
+                            color: AppColors.blackColor.withValues(alpha: 0.8),
+                          ),
+                        ),
                         subtitle: Padding(
                           padding: EdgeInsets.only(right: 12.w),
                           child: SizedBox(
@@ -115,87 +128,80 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                         trailing: Padding(
                           padding: EdgeInsets.only(right: 6.w),
-                          child: GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text(
-                                      "Are you sure you want to delete this product?",
-                                    ),
-                                    actions: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text(
-                                              "Cancel",
-                                              style: TextStyle(
-                                                color: Colors.green,
-                                              ),
-                                            ),
+                          child: Builder(
+                            builder: (context) {
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          "Are you sure you want to delete this product?",
+                                          style: Styles.bodyMedium.copyWith(
+                                            fontSize: 16.sp,
+                                            color: AppColors.greyColor,
                                           ),
-
-                                          TextButton(
-                                            onPressed: () {
-                                              FirebaseFirestore.instance
-                                                  .collection(
-                                                    "users-cart-items",
-                                                  )
-                                                  .doc(
-                                                    FirebaseAuth
-                                                        .instance
-                                                        .currentUser!
-                                                        .email,
-                                                  )
-                                                  .collection("items")
-                                                  .doc(documentSnapshot.id)
-                                                  .delete()
-                                                  .then(
-                                                    (onValue) {
-                                                      Fluttertoast.showToast(
-                                                        msg: "Deleted..",
-                                                        toastLength:
-                                                            Toast.LENGTH_SHORT,
-
-                                                        timeInSecForIosWeb: 1,
-                                                        backgroundColor:
-                                                            AppColors.greyColor,
-                                                        textColor: Colors.white,
-                                                        fontSize: 16.0,
-                                                      );
-                                                      // ignore: use_build_context_synchronously
-                                                      Navigator.pop(context);
-                                                    },
-
-                                                    // ignore: use_build_context_synchronously
-                                                  );
-                                            },
-                                            child: Text(
-                                              "Delete",
-                                              style: TextStyle(
-                                                color: Colors.red,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        actions: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  "Cancel",
+                                                  style: Styles.bodySmall
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 13.sp,
+                                                        color: Colors.green,
+                                                      ),
+                                                ),
                                               ),
-                                            ),
+
+                                              TextButton(
+                                                onPressed: () {
+                                                  cartController.deleteCart(
+                                                    context,
+                                                    documentSnapshot,
+                                                  );
+                                                },
+                                                child: Text(
+                                                  "Delete",
+                                                  style: Styles.bodySmall
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 13.sp,
+                                                        color: AppColors
+                                                            .redColor
+                                                            .withValues(
+                                                              alpha: 0.7,
+                                                            ),
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   );
                                 },
+
+                                child: Image.asset(
+                                  "assets/trash.png",
+                                  width: 25.w,
+                                  height: 25.h,
+                                ),
                               );
                             },
-
-                            child: Image.asset(
-                              "assets/trash.png",
-                              width: 25.w,
-                              height: 25.h,
-                            ),
                           ),
                         ),
                       ),
@@ -209,5 +215,4 @@ class _CartScreenState extends State<CartScreen> {
       ),
     );
   }
-
 }

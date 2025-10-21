@@ -1,23 +1,24 @@
 import 'package:e_commerce_app/const/app_colors.dart';
-import 'package:e_commerce_app/mainController.dart';
+import 'package:e_commerce_app/const/text_size.dart';
+import 'package:e_commerce_app/authNotifier_Screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class SplashScreen1 extends StatefulWidget {
+class SplashScreen extends StatefulWidget {
   static final String path = "/";
-  const SplashScreen1({super.key});
+  const SplashScreen({super.key});
 
   @override
-  State<SplashScreen1> createState() => _SplashScreen1State();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreen1State extends State<SplashScreen1> {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 3), () {
       // ignore: use_build_context_synchronously
-      Navigator.pushNamed(context, MainController.path);
+      Navigator.pushNamed(context, AuthNotifierScreen.path);
     });
     super.initState();
   }
@@ -32,10 +33,11 @@ class _SplashScreen1State extends State<SplashScreen1> {
           children: [
             Text(
               "E-COMMERCE",
-              style: TextStyle(
-                color: Colors.white,
+              style: Styles.mediumTitle.copyWith(
+                color: AppColors.whiteColor,
+                fontSize: 34.sp,
                 fontWeight: FontWeight.bold,
-                fontSize: 38.sp,
+                fontFamily: Styles.secondaryFontFamily,
               ),
             ),
             SizedBox(height: 20.h),

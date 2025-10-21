@@ -1,16 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
+import 'package:e_commerce_app/controllers/product_detail_controller.dart';
 import 'package:e_commerce_app/ui/bottom_nav_pages/cart.dart';
+import 'package:e_commerce_app/ui/payment_successful_screen.dart';
 import 'package:e_commerce_app/ui/search_screen.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 
 // ignore: must_be_immutable
 class DetailsScreen extends StatefulWidget {
@@ -23,66 +27,11 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
-  var dotPosition = 0;
-  int currentValue = 1;
-  Future addToCart() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    var currentUser = auth.currentUser;
-    CollectionReference collectionReference = FirebaseFirestore.instance
-        .collection("users-cart-items");
-    return collectionReference
-        .doc(currentUser?.email)
-        .collection("items")
-        .doc()
-        .set({
-          "name": widget.allProduct["product-name"],
-          "price": widget.allProduct["product-price"],
-          "image": widget.allProduct["product-image"],
-        })
-        .then(
-          (onValue) => {
-            Fluttertoast.showToast(
-              msg: "Successfully added",
-              toastLength: Toast.LENGTH_SHORT,
-
-              backgroundColor: AppColors.greyColor,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            ),
-          },
-        );
-  }
-
-  Future addToFavourite() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    var currentUser = auth.currentUser;
-    CollectionReference collectionReference = FirebaseFirestore.instance
-        .collection("users-fovourite-items");
-    return collectionReference
-        .doc(currentUser?.email)
-        .collection("items")
-        .doc()
-        .set({
-          "name": widget.allProduct["product-name"],
-          "price": widget.allProduct["product-price"],
-          "image": widget.allProduct["product-image"],
-        })
-        .then(
-          (onValue) => {
-            Fluttertoast.showToast(
-              msg: "Successfully added",
-              toastLength: Toast.LENGTH_SHORT,
-
-              backgroundColor: AppColors.greyColor,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            ),
-          },
-        );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ProductDetailController productDetailController = Get.put(
+      ProductDetailController(),
+    );
     return Scaffold(
       backgroundColor: AppColors.widgetColor,
       appBar: AppBar(
@@ -126,7 +75,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
             padding: EdgeInsets.only(right: 24.w, left: 12.w),
             child: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, CartScreen.path);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartScreen(isHide: true),
+                  ),
+                );
               },
               child: Icon(
                 Icons.shopping_cart_outlined,
@@ -143,19 +97,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
             children: [
               SizedBox(height: 20.h),
               Padding(
-                padding: AppDimansion.kDefaultPadding,
+                padding: AppDimansions.kDefaultPadding,
                 child: CarouselSlider(
                   carouselController: CarouselSliderController(),
                   items: widget.allProduct["product-image"]
                       .map<Widget>(
-                        (item) => Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.mainColor.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(12.r),
-                            image: DecorationImage(
-                              image: NetworkImage(item),
-                              fit: BoxFit.cover,
+                        (item) => ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: CachedNetworkImage(
+                            height: double.infinity.h,
+                            width: double.infinity.w,
+                            imageUrl: item,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
                             ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
                           ),
                         ),
                       )
@@ -168,22 +126,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     viewportFraction: 1,
 
                     onPageChanged: (val, carouselPageChanged) {
-                      setState(() {
-                        dotPosition = val;
-                      });
+                      productDetailController.position(
+                        val,
+                        carouselPageChanged,
+                      );
                     },
                   ),
                 ),
               ),
               SizedBox(height: 20.h),
-              DotsIndicator(
-                dotsCount: (widget.allProduct["product-image"] as List).length,
-                position: dotPosition.toDouble(),
-                decorator: DotsDecorator(
-                  color: AppColors.mainColor.withValues(alpha: 0.5),
-                  activeColor: AppColors.mainColor,
-                  size: Size(12, 12),
-                  activeSize: Size(12, 12),
+              Obx(
+                () => DotsIndicator(
+                  dotsCount:
+                      (widget.allProduct["product-image"] as List).length,
+                  position: productDetailController.dotPosition.toDouble(),
+                  decorator: DotsDecorator(
+                    color: AppColors.mainColor.withValues(alpha: 0.5),
+                    activeColor: AppColors.mainColor,
+                    size: Size(12, 12),
+                    activeSize: Size(12, 12),
+                  ),
                 ),
               ),
               SizedBox(height: 20.h),
@@ -193,31 +155,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                 ),
                 child: Padding(
-                  padding: AppDimansion.kDefaultPadding,
+                  padding: AppDimansions.kDefaultPadding,
                   child: Column(
                     children: [
                       SizedBox(height: 40.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            widget.allProduct["product-name"]
-                                    .toString()
-                                    .substring(0, 1)
-                                    .toUpperCase() +
-                                widget.allProduct["product-name"]
-                                    .toString()
-                                    .substring(
-                                      1,
-                                      widget.allProduct["product-name"]
-                                          .toString()
-                                          .length,
-                                    ),
-
-                            style: Styles.smallTitle.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.blackColor.withValues(
-                                alpha: 0.6,
+                          SizedBox(
+                            width: 200.w,
+                            child: Text(
+                              widget.allProduct["product-name"],
+                              style: Styles.smallTitle.copyWith(
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.blackColor.withValues(
+                                  alpha: 0.6,
+                                ),
                               ),
                             ),
                           ),
@@ -258,7 +212,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         height: 180,
         color: AppColors.whiteColor,
         child: Padding(
-          padding: AppDimansion.kDefaultPadding,
+          padding: AppDimansions.kDefaultPadding,
           child: Column(
             children: [
               SizedBox(height: 12.h),
@@ -280,61 +234,69 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     child: Center(
                       child: Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              if (currentValue > 1) {
-                                return setState(() {
-                                  currentValue--;
-                                });
-                              }
-                            },
-                            child: Container(
-                              height: 32.h,
-                              width: 32.h,
-                              decoration: BoxDecoration(
-                                color: currentValue == 1
-                                    ? AppColors.greyColor.withValues(alpha: 0.2)
-                                    : AppColors.redColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.remove,
-                                  color: currentValue == 1
-                                      ? AppColors.greyColor
+                          Obx(
+                            () => GestureDetector(
+                              onTap: () {
+                                if (productDetailController.currentValue > 1) {
+                                  // ignore: void_checks
+                                  return productDetailController.decrement();
+                                }
+                              },
+                              child: Container(
+                                height: 32.h,
+                                width: 32.h,
+                                decoration: BoxDecoration(
+                                  color:
+                                      productDetailController.currentValue == 1
+                                      ? AppColors.greyColor.withValues(
+                                          alpha: 0.2,
+                                        )
                                       : AppColors.redColor.withValues(
-                                          alpha: 0.7,
+                                          alpha: 0.1,
                                         ),
-                                  size: 24.h,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.remove,
+                                    color:
+                                        productDetailController.currentValue ==
+                                            1
+                                        ? AppColors.greyColor
+                                        : AppColors.redColor.withValues(
+                                            alpha: 0.7,
+                                          ),
+                                    size: 24.h,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 8.w, right: 8.w),
-                            child: currentValue < 10
-                                ? Text(
-                                    "0$currentValue",
-                                    style: TextStyle(
-                                      color: AppColors.blackColor,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w400,
+                          Obx(
+                            () => Padding(
+                              padding: EdgeInsets.only(left: 8.w, right: 8.w),
+                              child: productDetailController.currentValue < 10
+                                  ? Text(
+                                      "0${productDetailController.currentValue}",
+                                      style: TextStyle(
+                                        color: AppColors.blackColor,
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    )
+                                  : Text(
+                                      "${productDetailController.currentValue}",
+                                      style: TextStyle(
+                                        color: AppColors.blackColor,
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
-                                  )
-                                : Text(
-                                    "$currentValue",
-                                    style: TextStyle(
-                                      color: AppColors.blackColor,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
+                            ),
                           ),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                currentValue++;
-                              });
+                              productDetailController.increament();
                             },
                             child: Container(
                               height: 32.h,
@@ -382,7 +344,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           child: IconButton(
                             onPressed: () {
                               snapshots.data.docs.length == 0
-                                  ? addToFavourite()
+                                  ? productDetailController.addToFavourite(
+                                      widget,
+                                    )
                                   : Fluttertoast.showToast(
                                       msg: "Already added",
                                       toastLength: Toast.LENGTH_SHORT,
@@ -413,32 +377,59 @@ class _DetailsScreenState extends State<DetailsScreen> {
               SizedBox(height: 30.h),
               Row(
                 children: [
-                  Container(
-                    height: 42.h,
-                    width: 42.w,
-                    decoration: BoxDecoration(
-                      color: AppColors.mainColor,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                        onPressed: () {
-                          addToCart();
-                        },
-                        icon: Icon(
-                          Icons.shopping_cart_outlined,
-                          size: 28.h,
-                          color: AppColors.widgetColor,
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("users-cart-items")
+                        .doc(FirebaseAuth.instance.currentUser!.email)
+                        .collection("items")
+                        .where(
+                          "name",
+                          isEqualTo: widget.allProduct["product-name"],
+                        )
+                        .snapshots(),
+                    builder: (BuildContext context, AsyncSnapshot snapshots) {
+                      if (snapshots.data == null) {
+                        return Text("");
+                      }
+                      return Container(
+                        height: 42.h,
+                        width: 42.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.mainColor,
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
-                      ),
-                    ),
+                        child: Center(
+                          child: IconButton(
+                            onPressed: () {
+                              snapshots.data.docs.length == 0
+                                  ? productDetailController.addToCart(widget)
+                                  : Fluttertoast.showToast(
+                                      msg: "Already added",
+                                      toastLength: Toast.LENGTH_SHORT,
+
+                                      backgroundColor: AppColors.greyColor,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0,
+                                    );
+                            },
+                            icon: Padding(
+                              padding: EdgeInsets.only(right: 1.w),
+                              child: Image.asset(
+                                "assets/shoppingCart.png",
+                                color: AppColors.widgetColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   Spacer(),
                   CustomButton(
                     borderRadius: BorderRadius.circular(12.r),
                     height: 42.h,
                     width: 260.w,
-                    onTap: () {},
+                    onTap: () {Navigator.pushNamed(context, PaymentSuccessfulScreen.path);},
                     text: "BOY NOW",
                   ),
                 ],

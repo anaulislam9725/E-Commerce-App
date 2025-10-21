@@ -1,14 +1,16 @@
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
-import 'package:e_commerce_app/ui/user_form.dart';
+import 'package:e_commerce_app/controllers/registation_controller.dart';
+
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
 import 'package:e_commerce_app/widgets/social_container.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:get/get.dart';
 
 class SignUpScreen extends StatefulWidget {
   static final String path = "/SignUpScreen";
@@ -19,44 +21,11 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  bool isHide = true;
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  signUp() async {
-    try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: emailController.text,
-            password: passwordController.text,
-          );
-      var authCredential = credential.user;
-
-      if (authCredential!.uid.isNotEmpty) {
-        // ignore: use_build_context_synchronously
-        Navigator.pushNamed(context, UserForm.path);
-        emailController.clear();
-        passwordController.clear();
-      } else {
-        Fluttertoast.showToast(msg: "Something is worng");
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        Fluttertoast.showToast(msg: "The password provided is too weak.");
-      } else if (e.code == 'email-already-in-use') {
-        Fluttertoast.showToast(
-          msg: "The account already exists for that email.",
-        );
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height.h;
-    final double width = MediaQuery.of(context).size.width.w;
+    final RegistretionController registretionController = Get.put(
+      RegistretionController(),
+    );
     return Scaffold(
       body: Stack(
         children: [
@@ -65,8 +34,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             left: 0,
             bottom: 0,
             child: Container(
-              height: height * .35,
-              width: width,
+              height: AppDimansions.screenHeight * .35,
+              width: AppDimansions.screenWidth,
               decoration: BoxDecoration(color: AppColors.mainColor),
               child: Padding(
                 padding: EdgeInsets.only(top: 90.h, right: 20.w, left: 20.w),
@@ -116,8 +85,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
             child: SingleChildScrollView(
               child: Container(
-                height: height * .70,
-                width: width,
+                height: AppDimansions.screenHeight,
+                width: AppDimansions.screenWidth,
                 decoration: BoxDecoration(
                   color: AppColors.whiteColor,
                   borderRadius: BorderRadius.vertical(
@@ -125,7 +94,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 child: Padding(
-                  padding: AppDimansion.kDefaultPadding,
+                  padding: AppDimansions.kDefaultPadding,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -140,7 +109,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       SizedBox(height: 40.h),
                       CustomTextField(
-                        controller: emailController,
+                        controller: registretionController.emailController,
                         hintText: " email",
                         prefixIcon: Icon(
                           Icons.email,
@@ -148,23 +117,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      CustomTextField(
-                        obscureText: isHide,
-                        controller: passwordController,
-                        hintText: " password",
-                        prefixIcon: Icon(
-                          Icons.lock,
-                          color: AppColors.whiteColor,
-                        ),
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              isHide = !isHide;
-                            });
-                          },
-                          icon: Icon(
-                            isHide ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.white,
+                      Obx(
+                        () => CustomTextField(
+                          obscureText: registretionController.isHide.value,
+                          controller: registretionController.passwordController,
+                          hintText: " password",
+                          prefixIcon: Icon(
+                            Icons.lock,
+                            color: AppColors.whiteColor,
+                          ),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              registretionController.showHide();
+                            },
+                            icon: Icon(
+                              registretionController.isHide.value
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -172,7 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       SizedBox(height: 50.h),
                       CustomButton(
                         onTap: () {
-                          signUp();
+                          registretionController.signUp(context);
                         },
                         text: "SIGN UP",
                       ),

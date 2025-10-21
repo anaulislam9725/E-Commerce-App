@@ -27,10 +27,10 @@ class CustomButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(32.r),
         onTap: onTap,
         child: Ink(
-          height: height ?? AppDimansion.buttonHeight,
+          height: height ?? AppDimansions.buttonHeight,
           width: width ?? double.infinity,
           decoration: BoxDecoration(
-            borderRadius: borderRadius ?? AppDimansion.kBorderRadius,
+            borderRadius: borderRadius ?? AppDimansions.kBorderRadius,
             color: AppColors.mainColor,
           ),
           child: Center(

@@ -1,9 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
+import 'package:e_commerce_app/controllers/search_controller.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class SearchScreen extends StatefulWidget {
   static final String path = "/SearchScreen";
@@ -14,14 +17,13 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  TextEditingController searchController = TextEditingController();
-  var inputText = '';
   @override
   Widget build(BuildContext context) {
+    final SearchController searchScreenController = Get.put(SearchController());
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: AppDimansion.kDefaultPadding,
+          padding: AppDimansions.kDefaultPadding,
           child: Column(
             children: [
               Row(
@@ -42,13 +44,11 @@ class _SearchScreenState extends State<SearchScreen> {
               SizedBox(height: 22.h),
               CustomTextField(
                 autofocus: true,
-                controller: searchController,
+                controller: searchScreenController.searchEditingController,
                 onChanged: (val) {
-                  setState(() {
-                    inputText = val;
-                  });
+                  searchScreenController.currentText(val);
                 },
-                borderRadius: AppDimansion.kBorderRadius,
+                borderRadius: AppDimansions.kBorderRadius,
                 hintText: "Search",
                 style: TextStyle(
                   color: AppColors.blackColor.withValues(alpha: 0.7),
@@ -68,7 +68,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection("product")
-                      .where("name", isEqualTo: inputText)
+                      .where(
+                        "name",
+                        isEqualTo: searchScreenController.inputText.value,
+                      )
                       .snapshots(),
                   builder:
                       (
@@ -89,25 +92,27 @@ class _SearchScreenState extends State<SearchScreen> {
                             Map<String, dynamic> data =
                                 document.data() as Map<String, dynamic>;
                             return GestureDetector(
-                              onTap: (){
-
-                              },
-                              child: Card(
-                                elevation: 8,
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.only(left: 8),
-                                  title: Text(data["name"]),
-                                  leading: ClipRRect(
-                                    borderRadius: BorderRadius.horizontal(
-                                      left: Radius.circular(8),
+                              onTap: () {},
+                              child: GetBuilder<SearchController>(
+                                builder: (controller) {
+                                  return Card(
+                                    elevation: 8,
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.only(left: 8),
+                                      title: Text(data["name"]),
+                                      leading: ClipRRect(
+                                        borderRadius: BorderRadius.horizontal(
+                                          left: Radius.circular(8),
+                                        ),
+                                        child: CachedNetworkImage(
+                                          imageUrl: data["image"][1],
+                                          fit: BoxFit.cover,
+                                          width: 90.w,
+                                        ),
+                                      ),
                                     ),
-                                    child: Image.network(
-                                      data["image"][1],
-                                      fit: BoxFit.cover,
-                                      width: 90.w,
-                                    ),
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
                             );
                           }).toList(),

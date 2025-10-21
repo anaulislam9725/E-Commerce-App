@@ -1,14 +1,13 @@
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
-
+import 'package:e_commerce_app/controllers/sign_in_controller.dart';
 import 'package:e_commerce_app/ui/registration_screen.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
   static final String path = "/LoginScreen";
@@ -19,57 +18,147 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool isHide = true;
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  Future passwordResed() async {
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(
-        email: emailController.text.trim(),
-      );
-      showDialog(
-        // ignore: use_build_context_synchronously
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text("Password reset link send! check your email"),
-          );
-        },
-      );
-      emailController.clear();
-    } on FirebaseAuthException catch (e) {
-      showDialog(
-        // ignore: use_build_context_synchronously
-        context: context,
-        builder: (context) {
-          return AlertDialog(content: Text(e.message.toString()));
-        },
-      );
-    }
-  }
-
-  signIn() async {
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-    } on FirebaseAuthException catch (e) {
-      Fluttertoast.showToast(msg: e.code.toString());
-    } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
-    }
-  }
-
   @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    final SignInController controller = Get.put(SignInController());
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            bottom: 0,
+            child: Container(
+              width: AppDimansions.screenWidth,
+              decoration: BoxDecoration(color: AppColors.mainColor),
+              child: Padding(
+                padding: EdgeInsets.only(top: 60.h, left: 50.w),
+                child: Text("Sign In", style: Styles.mediumTitle),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 210.h,
+            right: 0,
+            left: 0,
+            bottom: 0,
+
+            child: SingleChildScrollView(
+              child: Container(
+                height: AppDimansions.screenHeight,
+                width: AppDimansions.screenWidth,
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(35.r),
+                  ),
+                ),
+                child: Padding(
+                  padding: AppDimansions.kDefaultPadding,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 30.h),
+                      Text("Welcome", style: Styles.largeTitle),
+
+                      Text(
+                        "Enter your Email Address to sign in Enjoy your shop:)",
+                        style: Styles.bodyMedium.copyWith(
+                          color: AppColors.greyColor.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      SizedBox(height: 40.h),
+                      CustomTextField(
+                        controller: controller.emailController,
+                        hintText: " email",
+                        prefixIcon: Icon(
+                          Icons.email,
+                          color: AppColors.whiteColor,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Obx(
+                        () => CustomTextField(
+                          obscureText: controller.isHide.value,
+                          controller: controller.passwordController,
+                          hintText: " password",
+                          prefixIcon: Icon(
+                            Icons.lock,
+                            color: AppColors.whiteColor,
+                          ),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              controller.showHide();
+                            },
+                            icon: Icon(
+                              controller.isHide.value
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              showDialogueBox(context, controller);
+                            },
+                            child: Text(
+                              "Forgot Password?",
+                              style: Styles.bodySmall.copyWith(
+                                color: AppColors.mainColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 50.h),
+                      CustomButton(
+                        onTap: () {
+                          controller.signIn();
+                        },
+                        text: "SIGNIN",
+                      ),
+                      SizedBox(height: 12.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Don't have an account?",
+                            style: Styles.extraSmall.copyWith(
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, SignUpScreen.path);
+                            },
+                            child: Text(
+                              "Create new account",
+                              style: Styles.extraSmall.copyWith(
+                                color: AppColors.mainColor,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  showDialogueBox(BuildContext context) {
+  showDialogueBox(BuildContext context, SignInController controller) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -104,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   bottom: 14.r,
                 ),
 
-                controller: emailController,
+                controller: controller.emailController,
                 style: TextStyle(color: AppColors.greyColor),
                 hintText: "Enter your Email",
                 hintColor: AppColors.greyColor.withValues(alpha: 0.7),
@@ -114,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 30.h),
               CustomButton(
                 onTap: () {
-                  passwordResed();
+                  controller.passwordResed(context);
                 },
 
                 borderRadius: BorderRadius.circular(12.r),
@@ -122,148 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ],
           ),
-
-          // print
-          // Text(controller.text.toString()),
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height.h;
-    final double width = MediaQuery.of(context).size.width.w;
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            bottom: 0,
-            child: Container(
-              height: height * .35,
-              width: width,
-              decoration: BoxDecoration(color: AppColors.mainColor),
-              child: Padding(
-                padding: EdgeInsets.only(top: 60.h, left: 50.w),
-                child: Text("Sign In", style: Styles.mediumTitle),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 210.h,
-            right: 0,
-            left: 0,
-            bottom: 0,
-
-            child: SingleChildScrollView(
-              child: Container(
-                height: height * .70,
-                width: width,
-                decoration: BoxDecoration(
-                  color: AppColors.whiteColor,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(35.r),
-                  ),
-                ),
-                child: Padding(
-                  padding: AppDimansion.kDefaultPadding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 30.h),
-                      Text("Welcome", style: Styles.largeTitle),
-
-                      Text(
-                        "Enter your Email Address to sign in Enjoy your shop:)",
-                        style: Styles.bodyMedium.copyWith(
-                          color: AppColors.greyColor.withValues(alpha: 0.7),
-                        ),
-                      ),
-                      SizedBox(height: 40.h),
-                      CustomTextField(
-                        controller: emailController,
-                        hintText: " email",
-                        prefixIcon: Icon(
-                          Icons.email,
-                          color: AppColors.whiteColor,
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      CustomTextField(
-                        obscureText: isHide,
-                        controller: passwordController,
-                        hintText: " password",
-                        prefixIcon: Icon(
-                          Icons.lock,
-                          color: AppColors.whiteColor,
-                        ),
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              isHide = !isHide;
-                            });
-                          },
-                          icon: Icon(
-                            isHide ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showDialogueBox(context);
-                            },
-                            child: Text(
-                              "Forgot Password?",
-                              style: Styles.bodySmall.copyWith(
-                                color: AppColors.mainColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 50.h),
-                      CustomButton(
-                        onTap: () {
-                          signIn();
-                        },
-                        text: "SIGNIN",
-                      ),
-                      SizedBox(height: 12.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Don't have an account?",
-                            style: Styles.extraSmall,
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, SignUpScreen.path);
-                            },
-                            child: Text(
-                              "Create new account",
-                              style: Styles.extraSmall.copyWith(
-                                color: AppColors.mainColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

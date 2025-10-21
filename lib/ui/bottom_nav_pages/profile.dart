@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
-import 'package:e_commerce_app/ui/bottom_nav_controller.dart';
+import 'package:e_commerce_app/controllers/profile_controller.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
   static final String path = "/ProfileScreen";
@@ -19,64 +19,19 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController numberController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  final controller = TextEditingController();
-  // updateData('name','anaul');
-  //  updateData('phone','017*****65');
-  updateData(String key, String value) {
-    CollectionReference collectionData = FirebaseFirestore.instance.collection(
-      "users_form_data",
-    );
-    return collectionData
-        .doc(FirebaseAuth.instance.currentUser!.email)
-        .update({
-          key: value,
-
-          // "name": nameController?.text,
-          // "phone": numberController?.text,
-        })
-        // ignore: use_build_context_synchronously
-        .then((onValue) {
-          Fluttertoast.showToast(
-            msg: "Successfully Updated",
-            toastLength: Toast.LENGTH_SHORT,
-
-            timeInSecForIosWeb: 1,
-            backgroundColor: AppColors.greyColor,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
-          // ignore: use_build_context_synchronously
-          Navigator.pop(context);
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ProfileController profileController = Get.put(ProfileController());
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.whiteColor,
         automaticallyImplyLeading: false,
         leadingWidth: 110.w,
-        // title: Text("print-----${}"),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, BottomNavController.path);
-          },
-          icon: Image.asset(
-            "assets/left-arrow.png",
-            width: 30.w,
-            fit: BoxFit.cover,
-            color: AppColors.greyColor,
-          ),
-        ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: AppDimansion.kDefaultPadding,
+          padding: AppDimansions.kDefaultPadding,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -122,16 +77,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       .doc(FirebaseAuth.instance.currentUser?.email)
                       .snapshots(),
                   builder: (BuildContext context, AsyncSnapshot snapshots) {
-                    var data = snapshots.data; // Get current user info
+                    var data = snapshots.data;
+
+                    // Get current user info
                     if (data == null) {
                       return Center(child: CircularProgressIndicator());
                     }
+
+                    if (!snapshots.hasData || !snapshots.data!.exists) {
+                      // 🟡 Document not found
+                      return const Text('No data found for this user');
+                    }
                     // ------------------- show user info in the textfield--------------
 
-                    nameController.text = data["name".toString()];
-                    numberController.text = data["number".toString()];
+                    profileController.nameController.text = data?["name"] ?? "";
+                    profileController.numberController.text =
+                        data?["number"] ?? "";
 
-                    emailController.text = FirebaseAuth
+                    profileController.emailController.text = FirebaseAuth
                         .instance
                         .currentUser!
                         .email
@@ -152,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.w500,
                             color: AppColors.blackColor.withValues(alpha: 0.6),
                           ),
-                          controller: nameController,
+                          controller: profileController.nameController,
                           decoration: InputDecoration(
                             prefixIcon: SizedBox(
                               width: 130.w,
@@ -186,9 +149,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             suffixIcon: IconButton(
                               onPressed: () {
                                 showDialogueBox(
-                                  context,
-                                  "name",
-                                  nameController, // 5
+                                  context: context,
+                                  userInfo: "name",
+                                  controller: profileController.nameController,
+                                  profileController: profileController,
                                 );
                               },
                               icon: Icon(
@@ -221,12 +185,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.w500,
                             color: AppColors.blackColor.withValues(alpha: 0.6),
                           ),
-                          controller: numberController,
+                          controller: profileController.numberController,
                           decoration: InputDecoration(
                             prefixIcon: Padding(
                               padding: EdgeInsets.only(bottom: 8.h),
                               child: SizedBox(
-                                width: 100.w,
+                                width: 110.w,
                                 child: Row(
                                   children: [
                                     Image.asset(
@@ -257,12 +221,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                               child: IconButton(
                                 onPressed: () {
-                                  controller.text = numberController.text
-                                      .toString();
+                                  profileController.controller.text =
+                                      profileController.numberController.text
+                                          .toString();
                                   showDialogueBox(
-                                    context,
-                                    "number",
-                                    numberController,
+                                    context: context,
+                                    userInfo: "number",
+                                    controller:
+                                        profileController.numberController,
+                                    profileController: profileController,
                                   );
                                 },
                                 icon: Icon(
@@ -296,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.w500,
                             color: AppColors.blackColor.withValues(alpha: 0.6),
                           ),
-                          controller: emailController,
+                          controller: profileController.emailController,
                           decoration: InputDecoration(
                             // prefixIcon: Icon(Icons.email, size: 28),
                             prefixIcon: Padding(
@@ -364,11 +331,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  showDialogueBox(
-    BuildContext context,
-    String userInfo, // name, phone
-    TextEditingController controller, // int a
-  ) {
+  showDialogueBox({
+    required BuildContext context,
+    required String userInfo, // name, phone
+    required TextEditingController controller, // int a
+    required ProfileController profileController,
+  }) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -392,7 +360,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    updateData(userInfo, controller.text);
+                    // context,userInfo,controller.text
+                    Get.put(ProfileController()).updateData(
+                      context: context,
+                      key: userInfo,
+                      value: controller.text,
+                    );
                   },
                   child: Text(
                     "Confirm",

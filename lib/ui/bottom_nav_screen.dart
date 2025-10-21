@@ -1,32 +1,30 @@
 import 'package:e_commerce_app/const/app_colors.dart';
-import 'package:e_commerce_app/ui/bottom_nav_pages/cart.dart';
-import 'package:e_commerce_app/ui/bottom_nav_pages/fovourite.dart';
-import 'package:e_commerce_app/ui/bottom_nav_pages/home.dart';
-import 'package:e_commerce_app/ui/bottom_nav_pages/profile.dart';
+import 'package:e_commerce_app/controllers/bottom_nav_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
-class BottomNavController extends StatefulWidget {
+class BottomNavScreen extends StatefulWidget {
   static final String path = "/BottomNavController";
-  const BottomNavController({super.key});
+  const BottomNavScreen({super.key});
 
   @override
-  State<BottomNavController> createState() => _BottomNavControllerState();
+  State<BottomNavScreen> createState() => _BottomNavScreenState();
 }
 
-class _BottomNavControllerState extends State<BottomNavController> {
-  final pages = [
-    HomeScreen(),
-    FavouriteScreen(),
-    CartScreen(),
-    ProfileScreen(),
-  ];
-  int currentInd = 0;
+class _BottomNavScreenState extends State<BottomNavScreen> {
   @override
   Widget build(BuildContext context) {
+    final BottomNavController bottomNavController2 = Get.put(
+      BottomNavController(),
+    );
     return Scaffold(
-      body: pages[currentInd],
+      body: Obx(
+        () =>
+            bottomNavController2.pages[bottomNavController2.currentIndex.value],
+      ),
+
       bottomNavigationBar: Container(
         color: AppColors.whiteColor,
         child: Padding(
@@ -34,11 +32,9 @@ class _BottomNavControllerState extends State<BottomNavController> {
           child: GNav(
             tabBackgroundColor: AppColors.mainColor.withValues(alpha: 0.2),
             backgroundColor: AppColors.whiteColor,
-            selectedIndex: currentInd,
+            selectedIndex: bottomNavController2.currentIndex.value,
             onTabChange: (index) {
-              setState(() {
-                currentInd = index;
-              });
+              bottomNavController2.pageRoute(index);
             },
             gap: 8,
             padding: EdgeInsets.all(16.h),
