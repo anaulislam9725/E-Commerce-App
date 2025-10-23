@@ -41,13 +41,16 @@ class SignInController extends GetxController {
   signIn() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        email: emailController.text,
+        password: passwordController.text,
       );
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.code.toString());
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
+      emailController.clear();
+      passwordController.clear();
     }
+    update();
   }
 }

@@ -58,21 +58,21 @@ class _PaymentSuccessfulScreenState extends State<PaymentSuccessfulScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.h),
                 child: Image.asset("assets/success.gif"),
               ),
               Text(
                 "Payment Successful!",
                 style: Styles.mediumTitle.copyWith(
-                  color: const Color.fromRGBO(76, 175, 80, 1),
-                  fontSize: 38.sp,
-                  letterSpacing: -0.8,
+                  color: Colors.green,
+                  fontSize: 32.sp,
+
                   fontWeight: FontWeight.w900,
                 ),
                 textAlign: TextAlign.center,
               ),
 
-              SizedBox(height: 160.h),
+              SizedBox(height: 200.h),
               CustomButton(
                 onTap: () {
                   Navigator.pushNamed(context, BottomNavScreen.path);

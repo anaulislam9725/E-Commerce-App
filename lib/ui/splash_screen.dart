@@ -18,7 +18,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     Future.delayed(Duration(seconds: 3), () {
       // ignore: use_build_context_synchronously
-      Navigator.pushNamed(context, AuthNotifierScreen.path);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AuthNotifierScreen()),
+      );
     });
     super.initState();
   }

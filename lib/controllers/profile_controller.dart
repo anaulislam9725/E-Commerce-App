@@ -22,10 +22,10 @@ class ProfileController extends GetxController {
         .doc(FirebaseAuth.instance.currentUser!.email)
         .update({
           key: value,
-
           // "name": nameController?.text,
           // "phone": numberController?.text,
         })
+        
         // ignore: use_build_context_synchronously
         .then((onValue) {
           Fluttertoast.showToast(
@@ -39,7 +39,10 @@ class ProfileController extends GetxController {
           );
           // ignore: use_build_context_synchronously
           Navigator.pop(context);
+
+           update();
         });
+       
   }
  
 }

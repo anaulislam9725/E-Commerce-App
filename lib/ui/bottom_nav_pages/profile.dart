@@ -92,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     profileController.nameController.text = data?["name"] ?? "";
                     profileController.numberController.text =
-                        data?["number"] ?? "";
+                        data?["phone"] ?? "";
 
                     profileController.emailController.text = FirebaseAuth
                         .instance
@@ -108,208 +108,223 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // ------------------- show user info in the textfield--------------
                     return Column(
                       children: [
-                        CustomTextField(
-                          textAlign: TextAlign.center,
-                          readOnly: true,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.blackColor.withValues(alpha: 0.6),
-                          ),
-                          controller: profileController.nameController,
-                          decoration: InputDecoration(
-                            prefixIcon: SizedBox(
-                              width: 130.w,
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: 8.h),
-                                child: Row(
-                                  children: [
-                                    Image.asset(
-                                      "assets/user.png",
-                                      fit: BoxFit.cover,
-                                      height: 18.h,
-                                      width: 18.w,
-                                      color: AppColors.blackColor.withValues(
-                                        alpha: 0.7,
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Text(
-                                      "Username",
-                                      style: Styles.smallTitle.copyWith(
-                                        fontSize: 18.sp,
-                                        color: AppColors.blackColor.withValues(
-                                          alpha: 0.7,
+                        GetBuilder<ProfileController>(
+                          builder: (controller) {
+                            return CustomTextField(
+                              textAlign: TextAlign.center,
+                              readOnly: true,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.blackColor.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              controller: profileController.nameController,
+                              decoration: InputDecoration(
+                                prefixIcon: SizedBox(
+                                  width: 130.w,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(bottom: 8.h),
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          "assets/user.png",
+                                          fit: BoxFit.cover,
+                                          height: 18.h,
+                                          width: 18.w,
+                                          color: AppColors.blackColor
+                                              .withValues(alpha: 0.7),
                                         ),
-                                      ),
+                                        SizedBox(width: 12.w),
+                                        Text(
+                                          "Username",
+                                          style: Styles.smallTitle.copyWith(
+                                            fontSize: 18.sp,
+                                            color: AppColors.blackColor
+                                                .withValues(alpha: 0.7),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
+                                ),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    showDialogueBox(
+                                      context: context,
+                                      userInfo: "name",
+                                      controller:
+                                          profileController.nameController,
+                                      profileController: profileController,
+                                    );
+                                  },
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: AppColors.greyColor,
+                                    size: 26.h,
+                                  ),
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.greyColor.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.greyColor.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                showDialogueBox(
-                                  context: context,
-                                  userInfo: "name",
-                                  controller: profileController.nameController,
-                                  profileController: profileController,
-                                );
-                              },
-                              icon: Icon(
-                                Icons.edit,
-                                color: AppColors.greyColor,
-                                size: 26.h,
-                              ),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.greyColor.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.greyColor.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                         SizedBox(height: 12.h),
-                        CustomTextField(
-                          textAlign: TextAlign.center,
-                          readOnly: true,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.blackColor.withValues(alpha: 0.6),
-                          ),
-                          controller: profileController.numberController,
-                          decoration: InputDecoration(
-                            prefixIcon: Padding(
-                              padding: EdgeInsets.only(bottom: 8.h),
-                              child: SizedBox(
-                                width: 110.w,
-                                child: Row(
-                                  children: [
-                                    Image.asset(
-                                      "assets/call.png",
-                                      fit: BoxFit.cover,
-                                      height: 18.h,
-                                      width: 18.w,
-                                      color: AppColors.blackColor.withValues(
-                                        alpha: 0.7,
-                                      ),
-                                    ),
-                                    SizedBox(width: 14.w),
-                                    Text(
-                                      "Number",
-                                      style: Styles.smallTitle.copyWith(
-                                        fontSize: 18.sp,
-                                        color: AppColors.blackColor.withValues(
-                                          alpha: 0.7,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                        GetBuilder<ProfileController>(
+                          builder: (controller) {
+                            return CustomTextField(
+                              textAlign: TextAlign.center,
+                              readOnly: true,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.blackColor.withValues(
+                                  alpha: 0.6,
                                 ),
                               ),
-                            ),
-                            suffixIcon: Padding(
-                              padding: EdgeInsets.only(right: 8.h),
+                              controller: profileController.numberController,
+                              decoration: InputDecoration(
+                                prefixIcon: Padding(
+                                  padding: EdgeInsets.only(bottom: 8.h),
+                                  child: SizedBox(
+                                    width: 110.w,
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          "assets/call.png",
+                                          fit: BoxFit.cover,
+                                          height: 18.h,
+                                          width: 18.w,
+                                          color: AppColors.blackColor
+                                              .withValues(alpha: 0.7),
+                                        ),
+                                        SizedBox(width: 14.w),
+                                        Text(
+                                          "Number",
+                                          style: Styles.smallTitle.copyWith(
+                                            fontSize: 18.sp,
+                                            color: AppColors.blackColor
+                                                .withValues(alpha: 0.7),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                suffixIcon: Padding(
+                                  padding: EdgeInsets.only(right: 8.h),
 
-                              child: IconButton(
-                                onPressed: () {
-                                  profileController.controller.text =
-                                      profileController.numberController.text
-                                          .toString();
-                                  showDialogueBox(
-                                    context: context,
-                                    userInfo: "number",
-                                    controller:
-                                        profileController.numberController,
-                                    profileController: profileController,
-                                  );
-                                },
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: AppColors.greyColor,
-                                  size: 26.h,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      profileController.controller.text =
+                                          profileController
+                                              .numberController
+                                              .text
+                                              .toString();
+                                      showDialogueBox(
+                                        context: context,
+                                        userInfo: "number",
+                                        controller:
+                                            profileController.numberController,
+                                        profileController: profileController,
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: AppColors.greyColor,
+                                      size: 26.h,
+                                    ),
+                                  ),
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.greyColor.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.greyColor.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.greyColor.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.greyColor.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                         SizedBox(height: 12.h),
-                        CustomTextField(
-                          textAlign: TextAlign.center,
-                          readOnly: true,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.blackColor.withValues(alpha: 0.6),
-                          ),
-                          controller: profileController.emailController,
-                          decoration: InputDecoration(
-                            // prefixIcon: Icon(Icons.email, size: 28),
-                            prefixIcon: Padding(
-                              padding: EdgeInsets.only(bottom: 8.h),
-                              child: SizedBox(
-                                width: 100.w,
-                                child: Row(
-                                  children: [
-                                    Image.asset(
-                                      "assets/email.png",
-                                      fit: BoxFit.cover,
-                                      height: 20.h,
-                                      width: 20.w,
-                                      color: AppColors.blackColor.withValues(
-                                        alpha: 0.7,
-                                      ),
-                                    ),
-                                    SizedBox(width: 14.w),
-                                    Text(
-                                      "Email",
-                                      style: Styles.smallTitle.copyWith(
-                                        fontSize: 18.sp,
-                                        color: AppColors.blackColor.withValues(
-                                          alpha: 0.7,
+                        GetBuilder<ProfileController>(
+                          builder: (controller) {
+                            return CustomTextField(
+                              textAlign: TextAlign.center,
+                              readOnly: true,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.blackColor.withValues(
+                                  alpha: 0.6,
+                                ),
+                              ),
+                              controller: profileController.emailController,
+                              decoration: InputDecoration(
+                                // prefixIcon: Icon(Icons.email, size: 28),
+                                prefixIcon: Padding(
+                                  padding: EdgeInsets.only(bottom: 8.h),
+                                  child: SizedBox(
+                                    width: 100.w,
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          "assets/email.png",
+                                          fit: BoxFit.cover,
+                                          height: 20.h,
+                                          width: 20.w,
+                                          color: AppColors.blackColor
+                                              .withValues(alpha: 0.7),
                                         ),
-                                      ),
+                                        SizedBox(width: 14.w),
+                                        Text(
+                                          "Email",
+                                          style: Styles.smallTitle.copyWith(
+                                            fontSize: 18.sp,
+                                            color: AppColors.blackColor
+                                                .withValues(alpha: 0.7),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.greyColor.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.greyColor.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.greyColor.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.greyColor.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                       ],
                     );

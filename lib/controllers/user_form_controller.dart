@@ -41,10 +41,13 @@ class UserFormController extends GetxController {
           "dob": dateOfBirthController.text,
           "gender": genterController.text,
           "age": ageController.text,
+          
         })
         .then(
           // ignore: use_build_context_synchronously
           (value) => Navigator.pushNamed(context, BottomNavScreen.path),
+        
         );
+        
   }
 }

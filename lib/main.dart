@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (_, child) => GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'BuyBuzz',
         initialRoute: SplashScreen.path,
         routes: RoutesHelper.appRoutes,
       ),

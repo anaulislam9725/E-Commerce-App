@@ -18,9 +18,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final SignInController controller = Get.put(SignInController());
+  @override
+  void dispose() {
+    controller.emailController.clear();
+    controller.passwordController.clear();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final SignInController controller = Get.put(SignInController());
     return Scaffold(
       body: Stack(
         children: [
@@ -117,11 +124,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       SizedBox(height: 50.h),
-                      CustomButton(
-                        onTap: () {
-                          controller.signIn();
+                      GetBuilder<SignInController>(
+                        builder: (controlle) {
+                          return CustomButton(
+                            onTap: () {
+                              controller.signIn();
+                            },
+                            text: "SIGNIN",
+                          );
                         },
-                        text: "SIGNIN",
                       ),
                       SizedBox(height: 12.h),
                       Row(
@@ -138,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pushNamed(context, SignUpScreen.path);
                             },
                             child: Text(
-                              "Create new account",
+                              "SignUp",
                               style: Styles.extraSmall.copyWith(
                                 color: AppColors.mainColor,
                                 letterSpacing: -0.5,

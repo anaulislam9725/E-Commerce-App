@@ -412,13 +412,21 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       fontSize: 16.0,
                                     );
                             },
-                            icon: Padding(
-                              padding: EdgeInsets.only(right: 1.w),
-                              child: Image.asset(
-                                "assets/shoppingCart.png",
-                                color: AppColors.widgetColor,
-                              ),
-                            ),
+                            icon: snapshots.data.docs.length == 0
+                                ? Padding(
+                                    padding: EdgeInsets.only(right: 1.w),
+                                    child: Image.asset(
+                                      "assets/shopping.png",
+                                      color: AppColors.widgetColor,
+                                    ),
+                                  )
+                                : Padding(
+                                    padding: EdgeInsets.only(right: 1.w),
+                                    child: Image.asset(
+                                      "assets/shoppingCart.png",
+                                      color: AppColors.widgetColor,
+                                    ),
+                                  ),
                           ),
                         ),
                       );
@@ -429,7 +437,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     borderRadius: BorderRadius.circular(12.r),
                     height: 42.h,
                     width: 260.w,
-                    onTap: () {Navigator.pushNamed(context, PaymentSuccessfulScreen.path);},
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        PaymentSuccessfulScreen.path,
+                      );
+                    },
                     text: "BOY NOW",
                   ),
                 ],
