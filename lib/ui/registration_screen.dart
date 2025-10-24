@@ -9,6 +9,7 @@ import 'package:e_commerce_app/widgets/social_container.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:get/get.dart';
 
@@ -143,13 +144,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       SizedBox(height: 50.h),
                       CustomButton(
                         onTap: () {
-                          registretionController.signUp(context);
+                          if (registretionController
+                              .emailController
+                              .text
+                              .isEmpty) {
+                            Fluttertoast.showToast(msg: "Email is required");
+                          } else if (registretionController
+                              .passwordController
+                              .text
+                              .isEmpty) {
+                            Fluttertoast.showToast(msg: "Password is required");
+                          } else {
+                            registretionController.signUp(context);
+                          }
                         },
                         text: "SIGN UP",
                       ),
                       SizedBox(height: 12.h),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "aleady have an account",

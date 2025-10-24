@@ -17,9 +17,17 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final SearchController searchScreenController = Get.put(SearchController());
+
+  @override
+  void dispose() {
+    searchScreenController.searchEditingController.clear();
+    searchScreenController.inputText.value = "";
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final SearchController searchScreenController = Get.put(SearchController());
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -65,59 +73,59 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               SizedBox(height: 24.h),
               Expanded(
-                child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection("product")
-                      .where(
-                        "name",
-                        isEqualTo: searchScreenController.inputText.value,
-                      )
-                      .snapshots(),
-                  builder:
-                      (
-                        BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshots,
-                      ) {
-                        if (snapshots.hasError) {
-                          return Center(child: Text("Something went wrong"));
-                        }
-                        if (snapshots.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: Text("Loading"));
-                        }
-                        return ListView(
-                          children: snapshots.data!.docs.map((
-                            DocumentSnapshot document,
+                child: GetBuilder<SearchController>(
+                  builder: (controller) {
+                    return StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection("product")
+                          .where(
+                            "name",
+                            isEqualTo: searchScreenController.inputText.value,
+                          )
+                          .snapshots(),
+
+                      builder:
+                          (
+                            BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshots,
                           ) {
-                            Map<String, dynamic> data =
-                                document.data() as Map<String, dynamic>;
-                            return GestureDetector(
-                              onTap: () {},
-                              child: GetBuilder<SearchController>(
-                                builder: (controller) {
-                                  return Card(
-                                    elevation: 8,
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.only(left: 8),
-                                      title: Text(data["name"]),
-                                      leading: ClipRRect(
-                                        borderRadius: BorderRadius.horizontal(
-                                          left: Radius.circular(8),
-                                        ),
-                                        child: CachedNetworkImage(
-                                          imageUrl: data["image"][1],
-                                          fit: BoxFit.cover,
-                                          width: 90.w,
-                                        ),
+                            if (snapshots.hasError) {
+                              return Center(
+                                child: Text("Something went wrong"),
+                              );
+                            }
+                            if (snapshots.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: Text("Loading"));
+                            }
+                            return ListView(
+                              children: snapshots.data!.docs.map((
+                                DocumentSnapshot document,
+                              ) {
+                                Map<String, dynamic> data =
+                                    document.data() as Map<String, dynamic>;
+                                return Card(
+                                  elevation: 8,
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.only(left: 8),
+                                    title: Text(data["name"]),
+                                    leading: ClipRRect(
+                                      borderRadius: BorderRadius.horizontal(
+                                        left: Radius.circular(8),
+                                      ),
+                                      child: CachedNetworkImage(
+                                        imageUrl: data["image"][1],
+                                        fit: BoxFit.cover,
+                                        width: 90.w,
                                       ),
                                     ),
-                                  );
-                                },
-                              ),
+                                  ),
+                                );
+                              }).toList(),
                             );
-                          }).toList(),
-                        );
-                      },
+                          },
+                    );
+                  },
                 ),
               ),
             ],

@@ -7,6 +7,7 @@ import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -106,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 12.h),
+                      SizedBox(height: 18.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -125,10 +126,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 50.h),
                       GetBuilder<SignInController>(
-                        builder: (controlle) {
+                        builder: (controller) {
                           return CustomButton(
                             onTap: () {
-                              controller.signIn();
+                              if (controller.emailController.text.isEmpty) {
+                                Fluttertoast.showToast(
+                                  msg: "Email is required",
+                                );
+                              } else if (controller
+                                  .passwordController
+                                  .text
+                                  .isEmpty) {
+                                Fluttertoast.showToast(
+                                  msg: "Password is required",
+                                );
+                              } else {
+                                controller.signIn();
+                              }
                             },
                             text: "SIGNIN",
                           );
@@ -136,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 12.h),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "Don't have an account?",

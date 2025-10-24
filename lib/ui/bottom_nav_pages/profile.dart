@@ -8,6 +8,7 @@ import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -19,9 +20,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final ProfileController profileController = Get.put(ProfileController());
   @override
   Widget build(BuildContext context) {
-    final ProfileController profileController = Get.put(ProfileController());
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
@@ -35,39 +36,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                // ignore: avoid_print
-                Center(
-                  child: Container(
-                    alignment: Alignment(1.w, 0.8.h),
-                    height: 120.w,
-                    width: 120.w,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.greyColor, width: 2),
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: AssetImage("assets/profile3.jpg"),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: 34.w,
-                        width: 34.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.greyColor,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.camera_alt_rounded,
-                            size: 22.h,
-                            color: AppColors.whiteColor,
+                GetBuilder<ProfileController>(
+                  builder: (controller) {
+                    return Container(
+                      height: 120.h,
+                      width: 120.h,
+                      decoration: BoxDecoration(shape: BoxShape.circle),
+                      child: Stack(
+                        alignment: AlignmentDirectional.bottomEnd,
+                        children: [
+                          controller.image != null
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    border: BoxBorder.all(
+                                      width: 2.5,
+                                      color: Colors.black.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                    ),
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: MemoryImage(controller.image!),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    border: BoxBorder.all(
+                                      width: 2.5.w,
+                                      color: Colors.black.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                    ),
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: AssetImage("assets/profile3.jpg"),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                          IconButton(
+                            onPressed: () {
+                              ShowImagePickarOption(context);
+                            },
+                            icon: Container(
+                              height: 32.h,
+                              width: 32.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey[800],
+                              ),
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
 
                 SizedBox(height: 40.h),
@@ -346,6 +375,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void ShowImagePickarOption(BuildContext context) {
+    showModalBottomSheet(
+      backgroundColor: AppColors.bottomColor,
+      context: context,
+      builder: (builder) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height / 4,
+          width: MediaQuery.of(context).size.width,
+
+          child: Padding(
+            padding: const EdgeInsets.only(top: 30),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      profileController.pickImageFormGallery(context);
+                    
+                    },
+                    child: SizedBox(
+                      child: Column(
+                        children: [
+                          Icon(Icons.image, size: 70, color: Colors.white),
+                          Text(
+                            "Gallery",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      profileController.pickImageFormCamera(context);
+              
+                    },
+                    child: SizedBox(
+                      child: Column(
+                        children: [
+                          Icon(Icons.camera_alt, size: 70, color: Colors.white),
+                          Text("Camera", style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   showDialogueBox({
     required BuildContext context,
     required String userInfo, // name, phone
@@ -366,7 +452,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    if (controller.text.isEmpty) {
+                    } else {
+                      Navigator.pop(context);
+                    }
                   },
                   child: Text(
                     "Cancel",
@@ -375,12 +464,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 TextButton(
                   onPressed: () {
+                    if (controller.text.isEmpty) {
+                      Fluttertoast.showToast(msg: "$userInfo is required");
+                    } else {
+                      Get.put(ProfileController()).updateData(
+                        context: context,
+                        key: userInfo,
+                        value: controller.text,
+                      );
+                    }
                     // context,userInfo,controller.text
-                    Get.put(ProfileController()).updateData(
-                      context: context,
-                      key: userInfo,
-                      value: controller.text,
-                    );
                   },
                   child: Text(
                     "Confirm",

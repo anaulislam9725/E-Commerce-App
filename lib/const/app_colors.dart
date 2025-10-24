@@ -8,4 +8,5 @@ class AppColors {
   static const Color blueColor = Color(0xff2196F3);
   static const Color redColor = Color(0xffFF0000);
   static const Color widgetColor = Color(0xffEEEEEE);
+  static const Color bottomColor = Color(0xff1F292B);
 }

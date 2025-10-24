@@ -62,7 +62,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
         actions: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, SearchScreen.path);
+              Navigator.pushNamed(
+                
+                //  Get.put(BottomNavController()).currentIndex.value=0;
+                context, SearchScreen.path
+       
+                );
             },
             child: Icon(
               Icons.search,

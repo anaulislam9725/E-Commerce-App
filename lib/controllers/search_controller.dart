@@ -7,5 +7,9 @@ class SearchController extends GetxController {
 
   currentText(val) {
     inputText.value = val;
+
+    update();
   }
+
+ 
 }

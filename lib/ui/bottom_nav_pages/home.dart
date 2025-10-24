@@ -86,7 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     border: Border.all(width: 2.w, color: Colors.grey),
                   ),
                   child: ClipOval(
-                    child: Image.asset("assets/profile.jpg", fit: BoxFit.cover),
+                    child: Image.asset(
+                      "assets/profile3.jpg",
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ],
