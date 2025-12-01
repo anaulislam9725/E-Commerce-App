@@ -3,6 +3,7 @@ import 'package:e_commerce_app/const/app_colors.dart';
 import 'package:e_commerce_app/const/dimension.dart';
 import 'package:e_commerce_app/const/text_size.dart';
 import 'package:e_commerce_app/controllers/profile_controller.dart';
+import 'package:e_commerce_app/ui/login_screen.dart';
 import 'package:e_commerce_app/widgets/custom_button.dart';
 import 'package:e_commerce_app/widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -364,6 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 CustomButton(
                   onTap: () {
                     FirebaseAuth.instance.signOut();
+                    Get.offAll(LoginScreen());
                   },
                   text: "LOGOUT",
                 ),
@@ -392,7 +394,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: InkWell(
                     onTap: () {
                       profileController.pickImageFormGallery(context);
-                    
                     },
                     child: SizedBox(
                       child: Column(
@@ -412,7 +413,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: InkWell(
                     onTap: () {
                       profileController.pickImageFormCamera(context);
-              
                     },
                     child: SizedBox(
                       child: Column(

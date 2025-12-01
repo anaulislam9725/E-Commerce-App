@@ -13,7 +13,7 @@ class RegistretionController extends GetxController {
   final TextEditingController passwordController = TextEditingController();
 
   signUp(BuildContext context) async {
-    try {
+    try { 
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
             email: emailController.text,

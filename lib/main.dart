@@ -1,5 +1,6 @@
 import 'package:e_commerce_app/routes/app_routes.dart';
 import 'package:e_commerce_app/ui/splash_screen.dart';
+import 'package:e_commerce_app/ui/user_form.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
